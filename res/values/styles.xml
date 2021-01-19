@@ -92,7 +92,7 @@
     </style>
 
     <style name="RegularToolbarStyle" parent="@style/Widget.AppCompat.Toolbar">
-        <item name="android:background">@color/toolbar_color</item>
+        <item name="android:background">?android:colorPrimary</item>
         <item name="android:elevation">0dp</item>
         <item name="android:theme">@style/WallpaperTheme</item>
     </style>

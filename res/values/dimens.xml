@@ -179,4 +179,6 @@
     <dimen name="disabled_by_admin_desktop_message_text_size">13sp</dimen>
     <dimen name="preview_bottom_sheet_corner_radius">?android:attr/dialogCornerRadius</dimen>
 
+    <!-- The maximum height ratio of PreviewPager and its parent view. -->
+    <item name="preview_pager_maximum_height_ratio" format="float" type="dimen">0.6</item>
 </resources>
