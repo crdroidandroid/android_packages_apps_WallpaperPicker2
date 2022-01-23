@@ -41,7 +41,7 @@
     <string name="daily_refresh_tile_title">Papur wal dyddiol</string>
     <string name="daily_refresh_tile_subtitle">Tapia i droi ymlaen</string>
     <string name="start_rotation_dialog_body_live_wallpaper_needed">      Bydd y papur wal yn newid yn awtomatig pob dydd. I orffen gosod, tapia 
-      &lt;strong&gt;Gosod papur wal&lt;/strong&gt; ar y sgrin nesaf.
+      <![CDATA[<strong>Gosod papur wal</strong>]]> ar y sgrin nesaf.
     </string>
     <string name="start_rotation_dialog_wifi_only_option_message">      Lawrlwytho papurau wal yn y dyfodol dros Wi-Fi yn unig
     </string>
