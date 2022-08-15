@@ -20,9 +20,6 @@
         <item name="colorPrimary">?android:colorPrimary</item>
         <item name="colorControlActivated">?attr/colorPrimary</item>
         <item name="android:statusBarColor">?attr/colorPrimary</item>
-        <item name="android:navigationBarColor">@color/translucent_black</item>
-        <item name="android:navigationBarDividerColor">@android:color/transparent</item>
-        <item name="android:windowLightStatusBar">false</item>
 
         <item name="actionBarSize">?android:attr/actionBarSize</item>
         <item name="homeAsUpIndicator">@drawable/material_ic_arrow_back_black_24</item>
@@ -70,10 +67,9 @@
         <item name="toolbarNavigationButtonStyle">@android:style/Widget.Toolbar.Button.Navigation
         </item>
 
-        <!-- Set status bar and navigation buttons to be translucent. -->
+        <!-- Set status bar to be translucent. -->
         <item name="android:colorPrimaryDark">@color/translucent_black</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
 
         <!-- Apply borderless button style for the right ripple effect. -->
         <item name="borderlessButtonStyle">@android:style/Widget.DeviceDefault.Button.Borderless
