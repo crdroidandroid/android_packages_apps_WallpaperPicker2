@@ -139,7 +139,7 @@ constructor(
         for (extra in extras) {
             val wpResId = partnerRes.getIdentifier(extra, "drawable", packageName)
             if (wpResId != 0) {
-                val thumbRes = partnerRes.getIdentifier(extra + "_small", "drawable", packageName)
+                val thumbRes = partnerRes.getIdentifier(extra, "drawable", packageName)
                 if (thumbRes != 0) {
                     val wallpaperInfo: WallpaperInfo = PartnerWallpaperInfo(thumbRes, wpResId)
                     wallpaperInfos.add(wallpaperInfo)
