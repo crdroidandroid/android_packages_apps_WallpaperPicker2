@@ -92,7 +92,7 @@ public class PartnerWallpaperInfo extends DefaultWallpaperInfo {
         for (String extra : extras) {
             int wpResId = partnerRes.getIdentifier(extra, "drawable", packageName);
             if (wpResId != 0) {
-                final int thumbRes = partnerRes.getIdentifier(extra + "_small", "drawable", packageName);
+                final int thumbRes = partnerRes.getIdentifier(extra, "drawable", packageName);
 
                 if (thumbRes != 0) {
                     final int fullRes = partnerRes.getIdentifier(extra, "drawable", packageName);

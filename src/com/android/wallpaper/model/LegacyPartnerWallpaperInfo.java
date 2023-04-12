@@ -98,12 +98,7 @@ public class LegacyPartnerWallpaperInfo extends WallpaperInfo {
                 name = name.substring(0, dotPos);
             }
 
-            if (name.endsWith("_small")) {
-                // Skip thumbnails as they are handled when we iterate over the full size counterpart.
-                continue;
-            }
-
-            String thumbName = name + "_small" + extension;
+            String thumbName = name + extension;
             wallpaperInfos.add(new LegacyPartnerWallpaperInfo(thumbName, fullName));
         }
 
