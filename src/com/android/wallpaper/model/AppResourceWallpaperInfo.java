@@ -90,7 +90,7 @@ public class AppResourceWallpaperInfo extends WallpaperInfo {
             for (String name : wallpaperResNames) {
                 final int fullRes = resources.getIdentifier(name, DRAWABLE_DEF_TYPE, appInfo.packageName);
                 final int thumbRes = resources.getIdentifier(
-                        name + "_small", DRAWABLE_DEF_TYPE, appInfo.packageName);
+                        name, DRAWABLE_DEF_TYPE, appInfo.packageName);
                 if (fullRes != 0 && thumbRes != 0) {
                     WallpaperInfo wallpaperInfo = new AppResourceWallpaperInfo(
                             appInfo.packageName, thumbRes, fullRes);
