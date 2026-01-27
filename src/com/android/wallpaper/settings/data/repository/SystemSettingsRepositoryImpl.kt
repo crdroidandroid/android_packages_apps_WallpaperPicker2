@@ -65,6 +65,30 @@ class SystemSettingsRepositoryImpl(
         return intSetting(name, if (defaultValue) 1 else 0).map { it != 0 }
     }
 
+    override fun stringSetting(name: String, defaultValue: String?): Flow<String?> {
+        return callbackFlow {
+                fun trySendString() {
+                    trySend(Settings.System.getString(contentResolver, name) ?: defaultValue)
+                }
+                val observer =
+                    object : ContentObserver(null) {
+                        override fun onChange(selfChange: Boolean) {
+                            trySendString()
+                        }
+                    }
+
+                contentResolver.registerContentObserver(
+                    Settings.System.getUriFor(name),
+                    /* notifyForDescendants= */ false,
+                    observer,
+                )
+                trySendString()
+
+                awaitClose { contentResolver.unregisterContentObserver(observer) }
+            }
+            .flowOn(backgroundDispatcher)
+    }
+
     override suspend fun setInt(name: String, value: Int) {
         withContext(backgroundDispatcher) { Settings.System.putInt(contentResolver, name, value) }
     }
