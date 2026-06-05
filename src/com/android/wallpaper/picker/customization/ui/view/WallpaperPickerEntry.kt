@@ -92,7 +92,7 @@ constructor(context: Context, attrs: AttributeSet? = null) : FrameLayout(context
         wallpaperCarouselDesktop =
             if (shouldShowDesktopUi) requireViewById(R.id.wallpaper_carousel_desktop) else null
         backgroundLayout = requireViewById(R.id.wallpaper_picker_entry_background)
-        background = backgroundLayout.background as GradientDrawable
+        background = collapsedButton.background as GradientDrawable
         expandedContainer = requireViewById(R.id.wallpaper_picker_entry_expanded_container)
 
         defaultCornerRadius =
