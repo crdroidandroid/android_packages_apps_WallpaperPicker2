@@ -129,6 +129,12 @@ public class CreativeCategory extends WallpaperCategory {
         mWallpaperInfo = wallpaperInfo;
     }
 
+    public CreativeCategory(Context context, String title, String collectionId, Uri thumbUri,
+            int priority, android.app.WallpaperInfo wallpaperInfo, boolean isCollectionWallpaper) {
+        this(context, title, collectionId, thumbUri, priority, wallpaperInfo);
+        mIsCollectionWallpaper = isCollectionWallpaper;
+    }
+
     @Override
     public boolean supportsWallpaperSetUpdates() {
         return true;

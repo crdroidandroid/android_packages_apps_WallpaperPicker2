@@ -20,6 +20,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Resources
 import androidx.annotation.XmlRes
 import com.android.wallpaper.R
 import com.android.wallpaper.model.Category
@@ -142,15 +143,19 @@ constructor(
     override suspend fun getThirdPartyLiveWallpaperCategory
                 (excludedPackageNames: Set<String>): List<Category> {
         if (context.packageManager.hasSystemFeature(PackageManager.FEATURE_LIVE_WALLPAPER)) {
-            val liveWallpapers = liveWallpapersClient.getAll(excludedPackageNames)
+            val pixelCategories = getPixelLiveWallpaperCategories()
+            val excludedPackages = excludedPackageNames + PIXEL_LIVE_WALLPAPER_PACKAGE +
+                getCreativeWallpaperPackageNames()
+            val liveWallpapers = liveWallpapersClient.getAll(excludedPackages)
+            val categories = pixelCategories.toMutableList()
             if (liveWallpapers.isNotEmpty()) {
-                val thirdPartyLiveWallpaperCategory = ThirdPartyLiveWallpaperCategory(
+                categories += ThirdPartyLiveWallpaperCategory(
                     context.getString(R.string.live_wallpapers_category_title),
                     context.getString(R.string.live_wallpaper_collection_id), liveWallpapers,
                     PRIORITY_LIVE,
-                    getExcludedLiveWallpaperPackageNames() + excludedPackageNames)
-                return listOf(thirdPartyLiveWallpaperCategory)
+                    excludedPackages)
             }
+            return categories
         }
         return listOf()
     }
@@ -166,7 +171,75 @@ constructor(
                 }
             }
         }
+        excluded.addAll(getCreativeWallpaperPackageNames())
         return excluded
+    }
+
+    private fun getCreativeWallpaperPackageNames(): Set<String> {
+        return context.packageManager.queryIntentServices(
+                Intent(CREATIVE_WALLPAPER_ACTION), PackageManager.GET_META_DATA)
+            .map { it.serviceInfo.packageName }
+            .toSet()
+    }
+
+    private fun getPixelLiveWallpaperCategories(): List<Category> {
+        val packageManager = context.packageManager
+        return try {
+            val applicationInfo = packageManager.getApplicationInfo(
+                PIXEL_LIVE_WALLPAPER_PACKAGE, PackageManager.GET_META_DATA)
+            val resources = packageManager.getResourcesForApplication(applicationInfo)
+            val categoryArrayId = resources.getIdentifier(
+                "pixel_live_categories", "array", PIXEL_LIVE_WALLPAPER_PACKAGE)
+            if (categoryArrayId == 0) return emptyList()
+
+            resources.getStringArray(categoryArrayId).mapIndexedNotNull { index, categoryName ->
+                val title = resources.getStringResource(categoryName, "title")
+                    ?: return@mapIndexedNotNull null
+                val packageName = resources.getStringResource(categoryName, "package_name")
+                    ?: return@mapIndexedNotNull null
+                val featuredService = resources.getStringResource(
+                    categoryName, "featured_service_name")
+                val serviceNamesId = resources.getIdentifier(
+                    "${categoryName}_service_names", "array", PIXEL_LIVE_WALLPAPER_PACKAGE)
+                val serviceNames = if (serviceNamesId == 0) {
+                    emptyList()
+                } else {
+                    resources.getStringArray(serviceNamesId).toList()
+                }
+                val wallpapers = LiveWallpaperInfo.getFromSpecifiedPackage(
+                    context, packageName, serviceNames, true, "pixel_live_category_$categoryName")
+                if (wallpapers.isEmpty()) return@mapIndexedNotNull null
+                val featuredIndex = wallpapers.indexOfFirst {
+                    it.wallpaperComponent?.serviceName == featuredService
+                }.takeIf { it >= 0 } ?: 0
+                val priority = resources.getIntegerResource(categoryName, "priority") ?: 0
+                WallpaperCategory(
+                    title,
+                    "pixel_live_category_$categoryName",
+                    featuredIndex,
+                    wallpapers,
+                    priority + PIXEL_LIVE_PRIORITY_OFFSET,
+                    true,
+                    PIXEL_LIVE_DOWNLOAD_ACTION,
+                )
+            }
+        } catch (e: PackageManager.NameNotFoundException) {
+            emptyList()
+        } catch (e: Resources.NotFoundException) {
+            emptyList()
+        }
+    }
+
+    private fun Resources.getStringResource(categoryName: String, suffix: String): String? {
+        val id = getIdentifier(
+            "${categoryName}_$suffix", "string", PIXEL_LIVE_WALLPAPER_PACKAGE)
+        return id.takeIf { it != 0 }?.let { getString(it) }
+    }
+
+    private fun Resources.getIntegerResource(categoryName: String, suffix: String): Int? {
+        val id = getIdentifier(
+            "${categoryName}_$suffix", "integer", PIXEL_LIVE_WALLPAPER_PACKAGE)
+        return id.takeIf { it != 0 }?.let { getInteger(it) }
     }
 
     override fun getExcludedThirdPartyPackageNames(): List<String> {
@@ -210,6 +283,12 @@ constructor(
         private const val TAG = "DefaultWallpaperCategoryClientImpl"
         private const val LAUNCHER_PACKAGE = "com.android.launcher"
         private const val LIVE_WALLPAPER_PICKER = "com.android.wallpaper.livepicker"
+        private const val CREATIVE_WALLPAPER_ACTION =
+            "com.google.android.apps.wallpaper.action.WALLPAPER_CREATION"
+        private const val PIXEL_LIVE_WALLPAPER_PACKAGE = "com.google.pixel.livewallpaper"
+        private const val PIXEL_LIVE_PRIORITY_OFFSET = 151
+        private const val PIXEL_LIVE_DOWNLOAD_ACTION =
+            "com.google.pixel.livewallpaper.action.DOWNLOAD_LIVE_WALLPAPER"
 
         /**
          * Relative category priorities. Lower numbers correspond to higher priorities (i.e., should

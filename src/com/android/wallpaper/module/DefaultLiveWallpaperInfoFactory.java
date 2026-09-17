@@ -17,6 +17,8 @@ package com.android.wallpaper.module;
 
 import androidx.annotation.Nullable;
 
+import com.android.wallpaper.model.CreativeCategory;
+import com.android.wallpaper.model.CreativeWallpaperInfo;
 import com.android.wallpaper.model.LiveWallpaperInfo;
 import com.android.wallpaper.model.WallpaperInfo;
 
@@ -28,12 +30,25 @@ public class DefaultLiveWallpaperInfoFactory implements LiveWallpaperInfoFactory
 
     @Override
     public WallpaperInfo getLiveWallpaperInfo(android.app.WallpaperInfo info) {
+        if (isCreativeWallpaper(info)) {
+            return new CreativeWallpaperInfo(info, false, info.getPackageName());
+        }
         return new LiveWallpaperInfo(info);
     }
 
     @Override
     public WallpaperInfo getLiveWallpaperInfo(android.app.WallpaperInfo info,
             boolean shouldShowTitle, @Nullable String collectionId) {
+        if (isCreativeWallpaper(info)) {
+            return new CreativeWallpaperInfo(info, shouldShowTitle, collectionId);
+        }
         return new LiveWallpaperInfo(info, shouldShowTitle, collectionId);
+    }
+
+    private static boolean isCreativeWallpaper(android.app.WallpaperInfo info) {
+        return (info.getServiceInfo().metaData != null
+                && info.getServiceInfo().metaData.containsKey(
+                        CreativeCategory.KEY_WALLPAPER_CREATIVE_CATEGORY))
+                || "com.google.android.apps.magicportrait".equals(info.getPackageName());
     }
 }

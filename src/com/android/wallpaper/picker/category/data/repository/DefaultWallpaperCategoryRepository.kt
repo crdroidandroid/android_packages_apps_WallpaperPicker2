@@ -19,6 +19,7 @@ package com.android.wallpaper.picker.category.data.repository
 import android.content.Context
 import android.util.Log
 import com.android.wallpaper.model.Category
+import com.android.wallpaper.model.ThirdPartyLiveWallpaperCategory
 import com.android.wallpaper.picker.category.client.DefaultWallpaperCategoryClient
 import com.android.wallpaper.picker.category.client.LiveWallpapersClient
 import com.android.wallpaper.picker.data.category.CategoryModel
@@ -131,7 +132,11 @@ constructor(
                                 // factory class because
                                 // the lambda depends on [CategoryModel]
                                 fetchWallpapers = { _ ->
-                                    liveWallpapersClient.getAllWallpapers(excludedPackageNames)
+                                    if (it is ThirdPartyLiveWallpaperCategory) {
+                                        liveWallpapersClient.getAllWallpapers(excludedPackageNames)
+                                    } else {
+                                        categoryModel.collectionCategoryData?.wallpaperModels
+                                    }
                                 }
                             )
                     )

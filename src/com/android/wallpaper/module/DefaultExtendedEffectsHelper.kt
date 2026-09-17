@@ -20,8 +20,14 @@ import javax.inject.Inject
 
 class DefaultExtendedEffectsHelper @Inject constructor() : ExtendedEffectsHelper {
     override val effectsPackage: String
-        get() = ""
+        get() = MAGIC_PORTRAIT_PACKAGE
 
     override val effectsActivity: String
-        get() = ""
+        get() = MAGIC_PORTRAIT_ACTIVITY
+
+    companion object {
+        private const val MAGIC_PORTRAIT_PACKAGE = "com.google.android.apps.magicportrait"
+        private const val MAGIC_PORTRAIT_ACTIVITY =
+            "com.google.android.apps.magicportrait.MagicPortraitActivity"
+    }
 }
