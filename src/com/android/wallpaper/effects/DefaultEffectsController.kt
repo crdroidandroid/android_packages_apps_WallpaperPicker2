@@ -20,4 +20,13 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /** Default [EffectsController] implementation for injecting into public picker app. */
-@Singleton class DefaultEffectsController @Inject constructor() : EffectsController()
+@Singleton
+class DefaultEffectsController @Inject constructor() : EffectsController() {
+    override fun getEffectsPackageName(): String {
+        return CINEMATIC_EFFECTS_PACKAGE
+    }
+
+    companion object {
+        private const val CINEMATIC_EFFECTS_PACKAGE = "com.google.android.wallpaper.effects"
+    }
+}

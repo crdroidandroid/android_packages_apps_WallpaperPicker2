@@ -30,6 +30,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcel;
+import android.os.PersistableBundle;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -461,13 +462,29 @@ public class CreativeWallpaperInfo extends LiveWallpaperInfo {
                         wallpaperInfo.getComponent()).build();
         int descriptionContentHandlingIndex = cursor.getColumnIndex(
                 WallpaperInfoContract.WALLPAPER_DESCRIPTION_CONTENT_HANDLING);
-        if (descriptionContentHandlingIndex >= 0) {
+        if (descriptionContentHandlingIndex >= 0
+                && !cursor.isNull(descriptionContentHandlingIndex)) {
             descriptionContentHandling = descriptionFromBytes(
                 cursor.getBlob(descriptionContentHandlingIndex));
             if (descriptionContentHandling.getComponent() == null) {
                 descriptionContentHandling =
                     descriptionContentHandling.toBuilder().setComponent(
                         wallpaperInfo.getComponent()).build();
+            }
+        }
+        int assetIdIndex = cursor.getColumnIndex(WallpaperInfoContract.ASSET_ID);
+        if (assetIdIndex >= 0 && !cursor.isNull(assetIdIndex)) {
+            String assetId = cursor.getString(assetIdIndex);
+            if (!TextUtils.isEmpty(assetId)) {
+                PersistableBundle content = descriptionContentHandling.getContent();
+                content.putString(WallpaperInfoContract.ASSET_ID, assetId);
+                WallpaperDescription.Builder builder = descriptionContentHandling.toBuilder()
+                        .setId(assetId)
+                        .setContent(content);
+                if (descriptionContentHandling.getComponent() == null) {
+                    builder.setComponent(wallpaperInfo.getComponent());
+                }
+                descriptionContentHandling = builder.build();
             }
         }
         Boolean isNewCreativeWallpaper;

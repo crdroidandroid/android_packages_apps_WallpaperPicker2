@@ -25,6 +25,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Parcel;
 import android.service.wallpaper.WallpaperService;
 import android.text.TextUtils;
@@ -438,7 +439,17 @@ public class LiveWallpaperInfo extends WallpaperInfo {
     @Override
     public Asset getThumbAsset(Context context) {
         if (mThumbAsset == null) {
-            mThumbAsset = new LiveWallpaperThumbAsset(context, mInfo);
+            Uri thumbnailUri = null;
+            Bundle metadata = mInfo.getServiceInfo().metaData;
+            if (metadata != null) {
+                String thumbnail = metadata.getString("android.service.wallpaper.thumbnail");
+                if (thumbnail != null) {
+                    thumbnailUri = Uri.parse(thumbnail);
+                }
+            }
+            mThumbAsset = thumbnailUri == null
+                    ? new LiveWallpaperThumbAsset(context, mInfo)
+                    : new LiveWallpaperThumbAsset(context, mInfo, thumbnailUri, true);
         }
         return mThumbAsset;
     }
