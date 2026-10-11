@@ -293,7 +293,7 @@ public class LiveWallpaperInfo extends WallpaperInfo {
 
         List<ResolveInfo> allResolveInfos = pm.queryIntentServices(
                 new Intent(WallpaperService.SERVICE_INTERFACE),
-                PackageManager.GET_META_DATA | PackageManager.MATCH_DISABLED_COMPONENTS);
+                PackageManager.GET_META_DATA);
 
         // Filter ALL live wallpapers for only those in the list of specified service names.
         // Prefer this approach so we can make only one call to PackageManager (expensive!) rather than

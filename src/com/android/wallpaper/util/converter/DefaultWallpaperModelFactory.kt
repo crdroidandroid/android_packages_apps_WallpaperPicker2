@@ -16,10 +16,13 @@
 
 package com.android.wallpaper.util.converter
 
+import android.app.WallpaperManager
 import android.content.Context
 import com.android.wallpaper.model.CreativeWallpaperInfo
+import com.android.wallpaper.model.DownloadableLiveWallpaperInfo
 import com.android.wallpaper.model.LiveWallpaperInfo
 import com.android.wallpaper.model.WallpaperInfo
+import com.android.wallpaper.picker.data.DownloadableWallpaperData
 import com.android.wallpaper.picker.data.StaticWallpaperData
 import com.android.wallpaper.picker.data.WallpaperModel
 import com.android.wallpaper.util.converter.WallpaperModelFactory.Companion.getCommonWallpaperData
@@ -33,7 +36,27 @@ import javax.inject.Singleton
 class DefaultWallpaperModelFactory @Inject constructor() : WallpaperModelFactory {
 
     override fun getWallpaperModel(context: Context, wallpaperInfo: WallpaperInfo): WallpaperModel {
-        return if (wallpaperInfo is LiveWallpaperInfo) {
+        return if (wallpaperInfo is DownloadableLiveWallpaperInfo) {
+            val wallpaperManager = WallpaperManager.getInstance(context)
+            val currentHomeWallpaper =
+                wallpaperManager.getWallpaperInfo(WallpaperManager.FLAG_SYSTEM)
+            val currentLockWallpaper = wallpaperManager.getWallpaperInfo(WallpaperManager.FLAG_LOCK)
+            WallpaperModel.StaticWallpaperModel(
+                commonWallpaperData = wallpaperInfo.getCommonWallpaperData(context),
+                staticWallpaperData =
+                    StaticWallpaperData(asset = wallpaperInfo.getThumbAsset(context)),
+                imageWallpaperData = null,
+                networkWallpaperData = null,
+                downloadableWallpaperData =
+                    DownloadableWallpaperData(
+                        groupName = "",
+                        systemWallpaperInfo = wallpaperInfo.info,
+                        isTitleVisible = wallpaperInfo.isVisibleTitle,
+                        isApplied =
+                            wallpaperInfo.isApplied(currentHomeWallpaper, currentLockWallpaper),
+                    ),
+            )
+        } else if (wallpaperInfo is LiveWallpaperInfo) {
             WallpaperModel.LiveWallpaperModel(
                 commonWallpaperData = wallpaperInfo.getCommonWallpaperData(context),
                 liveWallpaperData = wallpaperInfo.getLiveWallpaperData(context),

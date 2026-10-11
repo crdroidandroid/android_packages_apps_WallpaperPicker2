@@ -25,6 +25,7 @@ import androidx.annotation.XmlRes
 import com.android.wallpaper.R
 import com.android.wallpaper.model.Category
 import com.android.wallpaper.model.DefaultWallpaperInfo
+import com.android.wallpaper.model.DownloadableLiveWallpaperInfo
 import com.android.wallpaper.model.ImageCategory
 import com.android.wallpaper.model.LegacyPartnerWallpaperInfo
 import com.android.wallpaper.model.LiveWallpaperInfo
@@ -207,7 +208,26 @@ constructor(
                     resources.getStringArray(serviceNamesId).toList()
                 }
                 val wallpapers = LiveWallpaperInfo.getFromSpecifiedPackage(
-                    context, packageName, serviceNames, true, "pixel_live_category_$categoryName")
+                    context,
+                    packageName,
+                    serviceNames,
+                    true,
+                    "pixel_live_category_$categoryName",
+                ).toMutableList()
+                val installedWallpaperCount = wallpapers.size
+                val downloadableWallpapers = DownloadableLiveWallpaperInfo.getFromSpecifiedPackage(
+                    context,
+                    packageName,
+                    serviceNames,
+                    "pixel_live_category_$categoryName",
+                )
+                wallpapers += downloadableWallpapers
+                android.util.Log.i(
+                    TAG,
+                    "Pixel wallpaper category=$categoryName, serviceNames=${serviceNames.size}, " +
+                        "installed=$installedWallpaperCount, downloadable=${downloadableWallpapers.size}, " +
+                        "total=${wallpapers.size}",
+                )
                 if (wallpapers.isEmpty()) return@mapIndexedNotNull null
                 val featuredIndex = wallpapers.indexOfFirst {
                     it.wallpaperComponent?.serviceName == featuredService
